@@ -20,4 +20,20 @@ public class NotificationController {
     this.service = service;
     this.repo = repo;
   }
+
+  /**
+   *  Solo usuarios autenticados pueden ver sus notificaciones no leídas.
+   * Se usa el userId del token (o del path, según prefieras).
+   */
+  @PreAuthorize("hasRole('USER')")
+  @GetMapping("/unread/{userId}")
+  public List<?> unread(@PathVariable Long userId) {
+    return service.unread(userId).stream().map(n -> java.util.Map.of(
+        "id", n.getId(),
+        "title", n.getTitle(),
+        "message", n.getMessage(),
+        "type", n.getNotificationType().name(),
+        "createdAt", n.getCreatedAt()
+    )).toList();
+  }
 }
