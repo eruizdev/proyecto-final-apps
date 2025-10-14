@@ -31,4 +31,27 @@ public class BookingController {
             b.getTotalAmount()
         ));
   }
+
+  // ADMIN o USER pueden ver reservas
+  @PreAuthorize("hasAnyRole('ADMIN','USER')")
+  @GetMapping("/{id}")
+  public BookingResponseDTO get(@PathVariable Long id) {
+    var b = service.get(id);
+    return new BookingResponseDTO(
+        b.getId(),
+        b.getBookingStatus().name(),
+        b.getStartTime(),
+        b.getEndTime(),
+        b.getAttendees(),
+        b.getTotalAmount()
+    );
+  }
+
+  // ADMIN o USER pueden cancelar reservas
+  @PreAuthorize("hasAnyRole('ADMIN','USER')")
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> cancel(@PathVariable Long id) {
+    service.cancel(id);
+    return ResponseEntity.noContent().build();
+  }
 }
