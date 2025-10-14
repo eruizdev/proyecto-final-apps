@@ -1,1 +1,1 @@
-package com.coworking.application.coworking_booking;
+package main.java.com.coworking.application.coworking_booking;
