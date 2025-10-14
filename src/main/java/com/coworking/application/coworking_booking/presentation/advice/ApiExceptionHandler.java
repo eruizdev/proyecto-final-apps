@@ -21,4 +21,15 @@ public class ApiExceptionHandler {
   public ResponseEntity<?> validation(ValidationException ex){
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err("VALIDATION", ex.getMessage()));
   }
+
+    // Metodo para manejar errores de negocio y devolver un 422 Unprocessable Entity
+  @ExceptionHandler(BusinessException.class)
+  public ResponseEntity<?> business(BusinessException ex){
+    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(err("BUSINESS", ex.getMessage()));
+  }
+
+  // Metodo para manejar errores de autenticacion y devolver un 401 Unauthorized
+  private Map<String, Object> err(String code, String msg){
+    return Map.of("timestamp", Instant.now().toString(), "code", code, "message", msg);
+  }
 }
