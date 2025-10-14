@@ -12,5 +12,9 @@ import java.util.*;
 @Component @RequiredArgsConstructor
 public class PaymentRepositoryAdapter implements PaymentRepositoryPort {
 	
-	
+	private final PaymentJpaRepository jpa;
+	  public PaymentEntity save(PaymentEntity p){ return jpa.save(p); }
+	  public Optional<PaymentEntity> findByBookingId(Long bookingId){
+	    return Optional.ofNullable(jpa.findByBookingId(bookingId));
+	  }
 }
