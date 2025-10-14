@@ -70,3 +70,34 @@ public class BookingServiceImpl implements BookingService {
 
         return booking;
     }
+
+@Transactional(readOnly = true)
+    public BookingEntity get(Long id) {
+        return bookingRepo.findById(id).orElseThrow(() -> new NotFoundException("Reserva"));
+    }
+
+    @Transactional
+    public void cancel(Long bookingId) {
+        var booking = bookingRepo.findById(bookingId).orElseThrow(() -> new NotFoundException("Reserva"));
+        booking.setBookingStatus(BookingEntity.BookingStatus.CANCELLED);
+        booking.setUpdatedAt(LocalDateTime.now());
+        bookingRepo.save(booking);
+
+        paymentRepo.findByBookingId(bookingId).ifPresent(p -> {
+            p.setPaymentStatus(PaymentEntity.PaymentStatus.REFUNDED);
+            p.setUpdatedAt(LocalDateTime.now());
+            paymentRepo.save(p);
+        });
+        
+        // 🔔 Notificación + Auditoría completa (6 parámetros)
+        notificationService.notifyBookingCancelled(booking.getUser().getId(), booking.getId());
+        auditService.record(
+                booking.getUser().getId(),
+                "BOOKING",
+                booking.getId(),
+                "CANCEL",
+                "{\"status\":\"CONFIRMED\"}",
+                "{\"status\":\"CANCELLED\"}"
+        );
+    }
+}
