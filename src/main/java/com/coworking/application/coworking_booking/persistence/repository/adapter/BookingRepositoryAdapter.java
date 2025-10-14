@@ -14,6 +14,28 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class BookingRepositoryAdapter implements BookingRepositoryPort {
 	
+	private final BookingJpaRepository jpa;
+
+    @Override
+    public BookingEntity save(BookingEntity b) {
+        return jpa.save(b);
+    }
+
+    @Override
+    public Optional<BookingEntity> findById(Long id) {
+        return jpa.findById(id);
+    }
+
+    @Override
+    public boolean existsOverlap(Long sid, LocalDateTime s, LocalDateTime e, Set<BookingEntity.BookingStatus> states) {
+        return jpa.existsOverlap(sid, s, e, states);
+    }
+
+    @Override
+    public int countFutureByUser(Long userId) {
+        return jpa.countByUserIdAndStartTimeAfter(userId, LocalDateTime.now());
+    }
+	
 	
 }
 
