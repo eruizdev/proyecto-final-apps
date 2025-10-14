@@ -13,4 +13,11 @@ import java.util.List;
 @RequestMapping("/api/notifications")
 public class NotificationController {
     
+    private final NotificationService service;
+    private final NotificationJpaRepository repo;
+
+  public NotificationController(NotificationService service, NotificationJpaRepository repo) {
+    this.service = service;
+    this.repo = repo;
+  }
 }
