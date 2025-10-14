@@ -30,3 +30,38 @@ public class AdminWorkspaceServiceImpl implements AdminWorkspaceService {
   }
 
   
+  @Override
+  public SpaceTypeEntity updateType(Long id, SpaceTypeEntity t) {
+    var cur = types.findById(id).orElseThrow(() -> new NotFoundException("SpaceType"));
+    cur.setName(t.getName());
+    cur.setDescription(t.getDescription());
+    cur.setBasePricePerHour(t.getBasePricePerHour());
+    cur.setAmenities(t.getAmenities());
+    cur.setActive(t.getActive() != null ? t.getActive() : cur.getActive());
+    cur.setUpdatedAt(LocalDateTime.now());
+    return types.save(cur);
+  }
+
+  @Override
+  public void deleteType(Long id) { types.deleteById(id); }
+
+  @Override
+  public List<SpaceTypeEntity> listTypes() { return types.findAll(); }
+
+
+  // SPACES
+
+
+   @Override
+  public SpaceEntity createSpace(SpaceEntity s, Long spaceTypeId) {
+    var st = types.findById(spaceTypeId).orElseThrow(() -> new NotFoundException("SpaceType"));
+    var now = LocalDateTime.now();
+    s.setSpaceType(st);
+    s.setSpaceStatus(s.getSpaceStatus() != null ? s.getSpaceStatus() : SpaceEntity.SpaceStatus.AVAILABLE);
+    s.setActive(s.getActive());
+    s.setCreatedAt(now);
+    s.setUpdatedAt(now);
+    return spaces.save(s);
+  }
+
+  
