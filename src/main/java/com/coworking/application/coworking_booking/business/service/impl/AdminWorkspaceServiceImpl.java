@@ -64,4 +64,11 @@ public class AdminWorkspaceServiceImpl implements AdminWorkspaceService {
     return spaces.save(s);
   }
 
-  
+   @Override
+  public SpaceEntity updateSpace(Long id, SpaceEntity s, Long spaceTypeId) {
+    var cur = spaces.findById(id).orElseThrow(() -> new NotFoundException("Space"));
+    if (spaceTypeId != null) {
+      var st = types.findById(spaceTypeId).orElseThrow(() -> new NotFoundException("SpaceType"));
+      cur.setSpaceType(st);
+    }
+    
