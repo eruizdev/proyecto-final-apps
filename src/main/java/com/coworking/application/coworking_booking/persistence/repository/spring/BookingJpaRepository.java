@@ -9,5 +9,17 @@ import java.util.Set;
 
 public interface BookingJpaRepository extends JpaRepository<BookingEntity, Long> {
 	
-	
+	@Query("""
+	        SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END
+	        FROM BookingEntity b
+	        WHERE b.space.id = :spaceId
+	          AND b.bookingStatus IN :states
+	          AND (b.startTime < :end AND b.endTime > :start)
+	    """)
+	    boolean existsOverlap(@Param("spaceId") Long spaceId,
+	                          @Param("start") LocalDateTime start,
+	                          @Param("end") LocalDateTime end,
+	                          @Param("states") Set<BookingEntity.BookingStatus> states);
+
+	    int countByUserIdAndStartTimeAfter(Long userId, LocalDateTime startAfter);
 }
