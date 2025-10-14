@@ -24,5 +24,45 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 	
-	
+	private final JwtProvider jwtProvider;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest req,
+                                    HttpServletResponse res,
+                                    FilterChain chain)
+            throws ServletException, IOException {
+
+        String header = req.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (header != null && header.startsWith("Bearer ")) {
+            try {
+                // Parsear y validar token
+                Claims claims = jwtProvider.parse(header.substring(7)).getBody();
+
+                // Extraer información del token
+                String subject = claims.getSubject(); // normalmente userId o email
+                String email = (String) claims.get("email");
+                String role = (String) claims.get("role");
+
+                // Construir autoridad con prefijo "ROLE_"
+                List<GrantedAuthority> authorities =
+                        List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
+                // Autenticación del contexto
+                Authentication authToken = new UsernamePasswordAuthenticationToken(
+                        email != null ? email : subject,
+                        null,
+                        authorities
+                );
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+
+            } catch (Exception ignored) {
+                // Si el token es inválido o expiró, no se lanza excepción
+                SecurityContextHolder.clearContext();
+            }
+        }
+
+        // Continuar la cadena de filtros
+        chain.doFilter(req, res);
+    }	
 }
