@@ -36,5 +36,21 @@ public class WorkspaceController {
     ).toList();
   }
 
-  
+  // ADMIN o USER pueden ver detalles de un espacio
+  @PreAuthorize("hasAnyRole('ADMIN','USER')")
+  @GetMapping("/{id}")
+  public WorkspaceResponseDTO get(@PathVariable Long id) {
+    var s = service.get(id);
+    return new WorkspaceResponseDTO(
+        s.getId(),
+        s.getName(),
+        s.getSpaceType().getName(),
+        s.getCapacity(),
+        s.getPricePerHour(),
+        s.getSpaceStatus().name(),
+        s.getLocation()
+    );
+  }
+
+
 }
