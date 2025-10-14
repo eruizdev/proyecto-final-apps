@@ -89,6 +89,7 @@ public class BookingServiceImpl implements BookingService {
             paymentRepo.save(p);
         });
         
+        
         // 🔔 Notificación + Auditoría completa (6 parámetros)
         notificationService.notifyBookingCancelled(booking.getUser().getId(), booking.getId());
         auditService.record(
