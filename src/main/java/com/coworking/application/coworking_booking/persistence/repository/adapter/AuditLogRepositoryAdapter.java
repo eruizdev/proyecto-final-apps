@@ -10,6 +10,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AuditLogRepositoryAdapter implements AuditLogRepositoryPort {
 	
-	
-	
+	private final AuditLogJpaRepository jpa;
+
+    @Override
+    public AuditLogEntity save(AuditLogEntity log) {
+        return jpa.save(log);
+    }
+		
 }
