@@ -51,4 +51,49 @@ private final AdminWorkspaceService service;
     service.deleteType(id);
     return ResponseEntity.noContent().build();
   }
+
+  // Listar todos los tipos de espacio
+  @GetMapping("/space-types")
+  public List<SpaceTypeEntity> listTypes(){ return service.listTypes(); }
+
+  // Crear un nuevo espacio
+  @PostMapping("/spaces")
+  public ResponseEntity<SpaceEntity> createSpace(@RequestBody SpaceUpsertDTO dto){
+    var s = SpaceEntity.builder()
+        .name(dto.name()).description(dto.description())
+        .capacity(dto.capacity())
+        .pricePerHour(dto.pricePerHour())
+        .spaceStatus(dto.status()!=null ? SpaceEntity.SpaceStatus.valueOf(dto.status()) : null)
+        .location(dto.location()).equipment(dto.equipment()).images(dto.images())
+        .active(dto.active()!=null ? dto.active() : true)
+        .build();
+    return ResponseEntity.ok(service.createSpace(s, dto.spaceTypeId()));
+  }
+
+  // Actualizar un espacio existente
+  @PutMapping("/spaces/{id}")
+  public ResponseEntity<SpaceEntity> updateSpace(@PathVariable Long id, @RequestBody SpaceUpsertDTO dto){
+    var s = SpaceEntity.builder()
+        .name(dto.name()).description(dto.description())
+        .capacity(dto.capacity())
+        .pricePerHour(dto.pricePerHour())
+        .spaceStatus(dto.status()!=null ? SpaceEntity.SpaceStatus.valueOf(dto.status()) : null)
+        .location(dto.location()).equipment(dto.equipment()).images(dto.images())
+        .active(dto.active()!=null ? dto.active() : true)
+        .build();
+    return ResponseEntity.ok(service.updateSpace(id, s, dto.spaceTypeId()));
+  }
+
+  // Eliminar un espacio
+  @DeleteMapping("/spaces/{id}")
+  public ResponseEntity<Void> deleteSpace(@PathVariable Long id){
+    service.deleteSpace(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  // Listar todos los espacios
+  
+  @GetMapping("/spaces")
+  public List<SpaceEntity> listSpaces(){ return service.listSpaces(); }
+
 }
