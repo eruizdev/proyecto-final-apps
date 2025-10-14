@@ -84,10 +84,3 @@ public class AdminWorkspaceServiceImpl implements AdminWorkspaceService {
     return spaces.save(cur);
   }
 
-  @Override
-  public void deleteSpace(Long id) { spaces.deleteById(id); }
-
-  @Override
-  public List<SpaceEntity> listSpaces() { return spaces.findAll(); }
-}
-
