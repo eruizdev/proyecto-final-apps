@@ -12,5 +12,9 @@ import java.util.*;
 @Component @RequiredArgsConstructor
 public class WorkspaceRepositoryAdapter implements WorkspaceRepositoryPort {
 	
-	
+	private final SpaceJpaRepository jpa;
+	  public Optional<SpaceEntity> findSpaceById(Long id){ return jpa.findById(id); }
+	  public List<SpaceEntity> findActiveAvailable(){
+	    return jpa.findByActiveTrueAndSpaceStatus(SpaceEntity.SpaceStatus.AVAILABLE);
+	  }
 }
