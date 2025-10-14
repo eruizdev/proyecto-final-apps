@@ -32,4 +32,23 @@ private final AdminWorkspaceService service;
         .build();
     return ResponseEntity.ok(service.createType(t));
   }
+
+  // Listar todos los tipos de espacio 
+  @PutMapping("/space-types/{id}")
+  public ResponseEntity<SpaceTypeEntity> updateType(@PathVariable Long id, @RequestBody SpaceTypeUpsertDTO dto){
+    var t = SpaceTypeEntity.builder()
+        .name(dto.name()).description(dto.description())
+        .basePricePerHour(dto.basePricePerHour())
+        .amenities(dto.amenities())
+        .active(dto.active())
+        .build();
+    return ResponseEntity.ok(service.updateType(id, t));
+  }
+
+  // Metodo para listar todos los tipos de espacio
+  @DeleteMapping("/space-types/{id}")
+  public ResponseEntity<Void> deleteType(@PathVariable Long id){
+    service.deleteType(id);
+    return ResponseEntity.noContent().build();
+  }
 }
