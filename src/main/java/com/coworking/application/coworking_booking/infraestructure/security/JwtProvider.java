@@ -69,5 +69,5 @@ public class JwtProvider {
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token);
-    }
+    }	
 }
