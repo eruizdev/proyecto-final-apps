@@ -15,4 +15,10 @@ public class ApiExceptionHandler {
   public ResponseEntity<?> notFound(NotFoundException ex){
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err("NOT_FOUND", ex.getMessage()));
   }
+
+  // Metodo para manejar errores de validacion y devolver un 400 Bad Request
+  @ExceptionHandler(ValidationException.class)
+  public ResponseEntity<?> validation(ValidationException ex){
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err("VALIDATION", ex.getMessage()));
+  }
 }
