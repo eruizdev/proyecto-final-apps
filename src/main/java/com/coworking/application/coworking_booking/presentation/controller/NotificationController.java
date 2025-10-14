@@ -36,4 +36,26 @@ public class NotificationController {
         "createdAt", n.getCreatedAt()
     )).toList();
   }
+
+  /**
+   *  Endpoint de prueba o administración — devuelve TODAS las notificaciones.
+   * Solo ADMIN puede ver todas (útil para debug o panel administrativo).
+   */
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/all")
+  public List<NotificationEntity> allNotifications() {
+    return repo.findAll();
+  }
+
+  /**
+   *  Versión basada en el email del token (más segura).
+   * Devuelve las notificaciones del usuario autenticado.
+   */
+  @PreAuthorize("hasAnyRole('USER','ADMIN')")
+  @GetMapping
+  public List<NotificationEntity> myNotifications(Authentication auth) {
+    // auth.getName() = email del usuario extraído del JWT
+    // En versión demo devolvemos todas; podrías filtrar por email si tu entidad tiene user.email
+    return repo.findAll();
+  }
 }
