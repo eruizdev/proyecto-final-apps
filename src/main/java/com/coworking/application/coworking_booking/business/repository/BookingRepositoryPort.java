@@ -8,3 +8,8 @@ import java.util.Set;
 public interface BookingRepositoryPort {
     BookingEntity save(BookingEntity b);
     Optional<BookingEntity> findById(Long id);
+    boolean existsOverlap(Long spaceId, LocalDateTime start, LocalDateTime end, Set<BookingEntity.BookingStatus> states);
+    int countFutureByUser(Long userId);
+}
+
+
