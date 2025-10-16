@@ -44,5 +44,10 @@ class BookingServiceIntegrationTest {
     var start = now.plusHours(3);
     var end = start.plusHours(2);
     var booking = bookingService.create(u.getId(), s.getId(), start, end, 3);
+
+    // Verificar que la reserva se haya creado correctamente
+    assertNotNull(booking.getId());
+    assertEquals(BookingEntity.BookingStatus.CONFIRMED, booking.getBookingStatus());
+    assertEquals(new BigDecimal("24000.00"), booking.getTotalAmount());
   }
 }
