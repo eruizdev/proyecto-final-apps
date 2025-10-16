@@ -65,6 +65,11 @@ class NotificationAuditIntegrationTest {
         .updatedAt(now)
         .build());
 
+    // 4 Crear reserva
+    var start = now.plusHours(3);
+    var end = start.plusHours(1);
+    var booking = bookingService.create(u.getId(), s.getId(), start, end, 2);
 
+    
   }
 }
