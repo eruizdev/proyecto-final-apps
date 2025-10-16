@@ -46,5 +46,11 @@ class BookingRepositoryOverlapTest {
         .attendees(2).totalAmount(new BigDecimal("2"))
         .createdAt(now).updatedAt(now).build());
     
+    // Verificar solapamiento con diferentes rangos de tiempo
+    boolean overlap = bookings.existsOverlap(s.getId(),
+        now.plusHours(4), now.plusHours(6),
+        Set.of(BookingEntity.BookingStatus.PENDING, BookingEntity.BookingStatus.CONFIRMED));
+    assertTrue(overlap);
+    
   }
 }
