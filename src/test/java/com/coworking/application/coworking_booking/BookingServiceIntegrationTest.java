@@ -32,5 +32,8 @@ class BookingServiceIntegrationTest {
     var u = users.save(UserEntity.builder().email("t@t.com").passwordHash("{noop}t")
         .firstName("Test").lastName("User").userRole(UserEntity.Role.USER)
         .active(true).emailVerified(true).createdAt(now).updatedAt(now).build());
+       // Creamos y guardamos un espacio en la base de datos
+        var st = types.save(SpaceTypeEntity.builder().name("Sala").basePricePerHour(new BigDecimal("10000"))
+        .active(true).createdAt(now).updatedAt(now).build());
   }
 }
