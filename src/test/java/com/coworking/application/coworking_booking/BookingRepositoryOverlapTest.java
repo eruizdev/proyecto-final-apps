@@ -34,6 +34,10 @@ class BookingRepositoryOverlapTest {
     // Crear tipo de espacio
     var st = types.save(SpaceTypeEntity.builder().name("Tipo").basePricePerHour(new BigDecimal("1"))
         .active(true).createdAt(now).updatedAt(now).build());
+    // Crear espacio asociado
+        var s = spaces.save(SpaceEntity.builder().spaceType(st).name("S1").capacity(2)
+        .pricePerHour(new BigDecimal("1")).spaceStatus(SpaceEntity.SpaceStatus.AVAILABLE)
+        .active(true).createdAt(now).updatedAt(now).build());
     
   }
 }
