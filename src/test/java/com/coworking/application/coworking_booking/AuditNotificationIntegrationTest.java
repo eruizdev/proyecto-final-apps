@@ -78,6 +78,12 @@ class NotificationAuditIntegrationTest {
                 && "CREATE".equals(a.getAction()));
 
     
-    
+    // 6 Verificar notificación
+    var notifList = notifications.findByUserIdAndIsReadFalseOrderByCreatedAtDesc(u.getId());
+    assertFalse(notifList.isEmpty(), "Debe existir al menos una notificación no leída");
+    assertThat(notifList)
+        .as("Debe existir una notificación de confirmación")
+        .anyMatch(n -> n.getUser().getId().equals(u.getId())
+                && n.getTitle().toLowerCase().contains("confirmada"));
   }
 }
