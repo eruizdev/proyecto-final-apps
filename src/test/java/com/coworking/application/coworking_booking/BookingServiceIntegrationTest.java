@@ -39,5 +39,10 @@ class BookingServiceIntegrationTest {
         var s = spaces.save(SpaceEntity.builder().spaceType(st).name("SalaX").capacity(4)
         .pricePerHour(new BigDecimal("12000")).spaceStatus(SpaceEntity.SpaceStatus.AVAILABLE)
         .active(true).createdAt(now).updatedAt(now).build());
+    
+    // Definir el rango de tiempo para la reserva
+    var start = now.plusHours(3);
+    var end = start.plusHours(2);
+    var booking = bookingService.create(u.getId(), s.getId(), start, end, 3);
   }
 }
