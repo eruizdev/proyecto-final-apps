@@ -31,6 +31,18 @@ class NotificationAuditIntegrationTest {
   void alCrearReservaSeGeneranNotificacionYAuditoria() {
     var now = LocalDateTime.now();
 
+    //  Crear usuario de prueba
+    var u = users.save(UserEntity.builder()
+        .email("n@a.com")
+        .passwordHash("{noop}x")
+        .firstName("N")
+        .lastName("A")
+        .userRole(UserEntity.Role.USER)
+        .active(true)
+        .emailVerified(true)
+        .createdAt(now)
+        .updatedAt(now)
+        .build());
 
 
   }
