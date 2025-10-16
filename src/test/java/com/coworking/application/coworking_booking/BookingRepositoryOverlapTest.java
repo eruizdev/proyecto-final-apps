@@ -22,4 +22,18 @@ class BookingRepositoryOverlapTest {
   @Autowired UserJpaRepository users;
   @Autowired SpaceJpaRepository spaces;
   @Autowired SpaceTypeJpaRepository types;
+
+  // Test para detectar solapamiento en reservas de la misma sala
+  @Test
+  void detectaSolapamientoEnMismaSala() {
+    var now = LocalDateTime.now();
+    // Crear usuario de prueba
+    var u = users.save(UserEntity.builder().email("u@x.com").passwordHash("x")
+        .firstName("U").lastName("X").userRole(UserEntity.Role.USER)
+        .active(true).emailVerified(true).createdAt(now).updatedAt(now).build());
+    // Crear tipo de espacio
+    var st = types.save(SpaceTypeEntity.builder().name("Tipo").basePricePerHour(new BigDecimal("1"))
+        .active(true).createdAt(now).updatedAt(now).build());
+    
+  }
 }
