@@ -56,9 +56,23 @@ class AdminSecurityCrudTest {
 
     // USER -> 403
     // Intento de crear un tipo de espacio con un usuario normal
+    // Se espera un estado 403 Forbidden
     mvc.perform(post("/api/admin/space-types")
         .header("Authorization","Bearer "+userToken)
         .contentType(MediaType.APPLICATION_JSON).content(body))
         .andExpect(status().isForbidden());
+
+
+        // Intento de crear un tipo de espacio con un usuario admin
+        // Se espera un estado 200 OK y que el ID del nuevo tipo de espacio exista
+        // ADMIN -> 200
+        mvc.perform(post("/api/admin/space-types")
+        .header("Authorization","Bearer "+adminToken)
+        .contentType(MediaType.APPLICATION_JSON).content(body))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").exists());
+    
+    
   }
+
 }
