@@ -61,6 +61,9 @@ class SecurityBookingTest {
       {"userId": %d, "spaceId": %d, "startTime": "%s", "endTime":"%s", "attendees": 2}
       """.formatted(userId, spaceId, start, end);
 
+    // Sin token → 401
+    mvc.perform(post("/api/bookings").contentType(MediaType.APPLICATION_JSON).content(body))
+        .andExpect(status().isUnauthorized());
   }
 
 }
