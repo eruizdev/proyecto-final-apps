@@ -38,6 +38,13 @@ class BookingRepositoryOverlapTest {
         var s = spaces.save(SpaceEntity.builder().spaceType(st).name("S1").capacity(2)
         .pricePerHour(new BigDecimal("1")).spaceStatus(SpaceEntity.SpaceStatus.AVAILABLE)
         .active(true).createdAt(now).updatedAt(now).build());
+
+    // Crear reserva inicial
+        bookings.save(BookingEntity.builder().user(u).space(s)
+        .startTime(now.plusHours(3)).endTime(now.plusHours(5))
+        .bookingStatus(BookingEntity.BookingStatus.CONFIRMED)
+        .attendees(2).totalAmount(new BigDecimal("2"))
+        .createdAt(now).updatedAt(now).build());
     
   }
 }
