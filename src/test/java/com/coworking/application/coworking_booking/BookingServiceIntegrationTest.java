@@ -35,5 +35,9 @@ class BookingServiceIntegrationTest {
        // Creamos y guardamos un espacio en la base de datos
         var st = types.save(SpaceTypeEntity.builder().name("Sala").basePricePerHour(new BigDecimal("10000"))
         .active(true).createdAt(now).updatedAt(now).build());
+        // Crear y guardar un espacio asociado al tipo de espacio
+        var s = spaces.save(SpaceEntity.builder().spaceType(st).name("SalaX").capacity(4)
+        .pricePerHour(new BigDecimal("12000")).spaceStatus(SpaceEntity.SpaceStatus.AVAILABLE)
+        .active(true).createdAt(now).updatedAt(now).build());
   }
 }
