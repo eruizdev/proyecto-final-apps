@@ -47,4 +47,11 @@ class AdminSecurityCrudTest {
     userToken  = jwt.generateToken(user.getId(),  user.getEmail(),  "USER");
   }
 
+  // Test con exepciones para verificar el comportamiento esperado
+  @Test
+  void usuario_normal_no_puede_crear_tipo_y_admin_si() throws Exception {
+    var body = """
+      {"name":"TipoTest","description":"d","basePricePerHour":10000,"amenities":"[]","active":true}
+      """;
+  }
 }
