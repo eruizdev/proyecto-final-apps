@@ -21,7 +21,7 @@ public class BookingPoliciesTest {
     assertDoesNotThrow(() -> new BookingPolicies().validateCreation(space, start, end, 5, false, 0));
   }
 
-  // Test para verificar que la validación falle cuando la capacidad es insuficiente
+  // Test para verificar que la validación falle cuando la capacidad es insuficiente en una reserva
   @Test
   void fallaPorSolapamiento() {
     var space = SpaceEntity.builder().capacity(5).spaceStatus(SpaceEntity.SpaceStatus.AVAILABLE).build();
@@ -29,6 +29,16 @@ public class BookingPoliciesTest {
     var end = start.plusHours(2);
     assertThrows(ValidationException.class,
         () -> new BookingPolicies().validateCreation(space, start, end, 4, true, 0));
+  }
+
+  // Test para verificar que la validacion falle por mas de 30 dias en una reserva
+  @Test
+  void fallaPorMasDe30Dias() {
+    var space = SpaceEntity.builder().capacity(5).spaceStatus(SpaceEntity.SpaceStatus.AVAILABLE).build();
+    var start = LocalDateTime.now().plusDays(31);
+    var end = start.plusHours(1);
+    assertThrows(ValidationException.class,
+        () -> new BookingPolicies().validateCreation(space, start, end, 4, false, 0));
   }
 
 }
