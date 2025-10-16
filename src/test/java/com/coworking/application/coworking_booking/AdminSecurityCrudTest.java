@@ -53,5 +53,12 @@ class AdminSecurityCrudTest {
     var body = """
       {"name":"TipoTest","description":"d","basePricePerHour":10000,"amenities":"[]","active":true}
       """;
+
+    // USER -> 403
+    // Intento de crear un tipo de espacio con un usuario normal
+    mvc.perform(post("/api/admin/space-types")
+        .header("Authorization","Bearer "+userToken)
+        .contentType(MediaType.APPLICATION_JSON).content(body))
+        .andExpect(status().isForbidden());
   }
 }
