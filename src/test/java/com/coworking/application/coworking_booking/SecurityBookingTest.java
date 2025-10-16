@@ -41,5 +41,9 @@ class SecurityBookingTest {
     var u = users.save(UserEntity.builder().email("sec@demo.com").passwordHash("{noop}x")
         .firstName("Sec").lastName("User").userRole(UserEntity.Role.USER)
         .active(true).emailVerified(true).createdAt(now).updatedAt(now).build());
+    // Guardamos el ID del usuario para usarlo en las pruebas
+    userId = u.getId();
+    var st = types.save(SpaceTypeEntity.builder().name("Tipo").basePricePerHour(new BigDecimal("10000"))
+        .active(true).createdAt(now).updatedAt(now).build());
   }
 }
