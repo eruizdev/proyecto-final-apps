@@ -21,4 +21,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // Anotación para indicar que es una prueba de integración de Spring Boot
 @SpringBootTest @AutoConfigureMockMvc
 class SecurityBookingTest {
+
+// Prueba para verificar la creación de una reserva
+// y anotaciones necesarias de JUnit
+  @Autowired MockMvc mvc;
+  @Autowired JwtProvider jwt;
+  @Autowired UserJpaRepository users;
+  @Autowired SpaceTypeJpaRepository types;
+  @Autowired SpaceJpaRepository spaces;
+
+  Long userId; Long spaceId;
+
+  @BeforeEach
+  void seed(){
+  }
 }
