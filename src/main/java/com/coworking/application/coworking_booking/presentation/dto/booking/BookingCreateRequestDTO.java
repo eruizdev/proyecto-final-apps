@@ -1,6 +1,6 @@
 // DTO para la creacion de reservas
 
-package main.java.com.coworking.application.coworking_booking.presentation.dto.booking;
+package com.coworking.application.coworking_booking.presentation.dto.booking;
 
 import java.time.LocalDateTime;
 
