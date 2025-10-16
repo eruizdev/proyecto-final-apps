@@ -85,5 +85,9 @@ class NotificationAuditIntegrationTest {
         .as("Debe existir una notificación de confirmación")
         .anyMatch(n -> n.getUser().getId().equals(u.getId())
                 && n.getTitle().toLowerCase().contains("confirmada"));
+
+    // 7 Verificar consistencia general
+    assertNotNull(booking.getId(), "El ID de la reserva no debe ser nulo");
+    assertThat(booking.getBookingStatus().name()).isEqualTo("CONFIRMED");
   }
 }
