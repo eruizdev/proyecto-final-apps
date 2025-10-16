@@ -53,8 +53,18 @@ class NotificationAuditIntegrationTest {
         .updatedAt(now)
         .build());
 
+    // 3 Crear espacio asociado
+    var s = spaces.save(SpaceEntity.builder()
+        .spaceType(st)
+        .name("Sala A")
+        .capacity(3)
+        .pricePerHour(new BigDecimal("12000"))
+        .spaceStatus(SpaceEntity.SpaceStatus.AVAILABLE)
+        .active(true)
+        .createdAt(now)
+        .updatedAt(now)
+        .build());
 
-        
 
   }
 }
