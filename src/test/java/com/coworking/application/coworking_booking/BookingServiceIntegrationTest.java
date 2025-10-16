@@ -16,4 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
 // Anotación para indicar que es una prueba de integración de Spring Boot
 @SpringBootTest
 class BookingServiceIntegrationTest {
+
+// Prueba para verificar la creación de una reserva
+// y anotaciones necesarias de JUnit
+  @Autowired BookingService bookingService;
+  @Autowired UserJpaRepository users;
+  @Autowired SpaceTypeJpaRepository types;
+  @Autowired SpaceJpaRepository spaces;
 }
