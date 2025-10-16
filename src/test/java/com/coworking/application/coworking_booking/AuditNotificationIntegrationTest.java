@@ -70,6 +70,14 @@ class NotificationAuditIntegrationTest {
     var end = start.plusHours(1);
     var booking = bookingService.create(u.getId(), s.getId(), start, end, 2);
 
+    // 5 Verificar auditoría
+    var auditList = audits.findAll();
+    assertThat(auditList)
+        .as("Debe haberse registrado una acción CREATE en AuditLog")
+        .anyMatch(a -> a.getEntityId().equals(booking.getId())
+                && "CREATE".equals(a.getAction()));
+
+    
     
   }
 }
