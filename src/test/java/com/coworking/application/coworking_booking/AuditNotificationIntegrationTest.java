@@ -31,7 +31,7 @@ class NotificationAuditIntegrationTest {
   void alCrearReservaSeGeneranNotificacionYAuditoria() {
     var now = LocalDateTime.now();
 
-    //  Crear usuario de prueba
+    //  1 Crear usuario de prueba 
     var u = users.save(UserEntity.builder()
         .email("n@a.com")
         .passwordHash("{noop}x")
@@ -44,6 +44,17 @@ class NotificationAuditIntegrationTest {
         .updatedAt(now)
         .build());
 
+        // 2 Crear tipo de espacio
+    var st = types.save(SpaceTypeEntity.builder()
+        .name("Tipo")
+        .basePricePerHour(new BigDecimal("10000"))
+        .active(true)
+        .createdAt(now)
+        .updatedAt(now)
+        .build());
+
+
+        
 
   }
 }
