@@ -17,4 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 class BookingRepositoryOverlapTest {
 
+// Anotaciones para inyectar los repositorios necesarios
+  @Autowired BookingJpaRepository bookings;
+  @Autowired UserJpaRepository users;
+  @Autowired SpaceJpaRepository spaces;
+  @Autowired SpaceTypeJpaRepository types;
 }
