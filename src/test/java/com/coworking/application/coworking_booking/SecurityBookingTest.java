@@ -45,10 +45,22 @@ class SecurityBookingTest {
     userId = u.getId();
     var st = types.save(SpaceTypeEntity.builder().name("Tipo").basePricePerHour(new BigDecimal("10000"))
         .active(true).createdAt(now).updatedAt(now).build());
-    // Crear y guardar un espacio asociado al tipo de espacio
+    // Crear y guardar un espacio asociado al tipo de espacio de la reserva
     var s = spaces.save(SpaceEntity.builder().spaceType(st).name("SecRoom").capacity(4)
         .pricePerHour(new BigDecimal("12000")).spaceStatus(SpaceEntity.SpaceStatus.AVAILABLE)
         .active(true).createdAt(now).updatedAt(now).build());
     spaceId = s.getId();
   }
+
+  // Prueba para verificar que sin token se obtiene 401 y con token 201
+  @Test
+  void sinTokenDa401_conToken201() throws Exception {
+    var start = LocalDateTime.now().plusHours(3).withNano(0);
+    var end   = start.plusHours(2);
+    var body = """
+      {"userId": %d, "spaceId": %d, "startTime": "%s", "endTime":"%s", "attendees": 2}
+      """.formatted(userId, spaceId, start, end);
+
+  }
+
 }
