@@ -32,7 +32,14 @@ class SecurityBookingTest {
 
   Long userId; Long spaceId;
 
+  // Prueba para crear una reserva confirmada con pago
   @BeforeEach
   void seed(){
+    // Crear y guardar un usuario en la base de datos
+    var now = LocalDateTime.now();
+    // Crear y guardar un tipo de espacio
+    var u = users.save(UserEntity.builder().email("sec@demo.com").passwordHash("{noop}x")
+        .firstName("Sec").lastName("User").userRole(UserEntity.Role.USER)
+        .active(true).emailVerified(true).createdAt(now).updatedAt(now).build());
   }
 }
