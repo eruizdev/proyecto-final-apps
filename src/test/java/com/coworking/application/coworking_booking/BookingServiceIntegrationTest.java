@@ -23,4 +23,14 @@ class BookingServiceIntegrationTest {
   @Autowired UserJpaRepository users;
   @Autowired SpaceTypeJpaRepository types;
   @Autowired SpaceJpaRepository spaces;
+
+  // Prueba para crear una reserva confirmada con pago
+  @Test
+  void creaReservaConfirmadaConPago() {
+    var now = LocalDateTime.now();
+    // Crear y guardar un tipo de espacio
+    var u = users.save(UserEntity.builder().email("t@t.com").passwordHash("{noop}t")
+        .firstName("Test").lastName("User").userRole(UserEntity.Role.USER)
+        .active(true).emailVerified(true).createdAt(now).updatedAt(now).build());
+  }
 }
