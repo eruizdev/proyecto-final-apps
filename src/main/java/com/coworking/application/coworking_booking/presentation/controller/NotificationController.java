@@ -1,4 +1,4 @@
-package main.java.com.coworking.application.coworking_booking.presentation.controller;
+package com.coworking.application.coworking_booking.presentation.controller;
 
 import com.coworking.application.coworking_booking.business.service.NotificationService;
 import com.coworking.application.coworking_booking.persistence.entity.NotificationEntity;

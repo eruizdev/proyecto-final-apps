@@ -1,6 +1,6 @@
 // DTO para la respuesta de espacios
 
-package main.java.com.coworking.application.coworking_booking.presentation.dto.workspace;
+package com.coworking.application.coworking_booking.presentation.dto.workspace;
 
 import java.math.BigDecimal;
 
