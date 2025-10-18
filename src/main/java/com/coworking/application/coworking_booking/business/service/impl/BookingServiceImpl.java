@@ -56,7 +56,7 @@ public class BookingServiceImpl implements BookingService {
 
         booking = bookingRepo.save(booking);
 
-        // 🔹 Detectar si tiene suscripción activa
+       
         boolean viaSub = subscriptionService != null && subscriptionService.hasActive(userId);
 
         paymentRepo.save(PaymentEntity.builder()
@@ -69,7 +69,7 @@ public class BookingServiceImpl implements BookingService {
                 .updatedAt(now)
                 .build());
 
-        // 🔔 Notificación + Auditoría completa (6 parámetros)
+    
         notificationService.notifyBookingCreated(userId, booking.getId());
         auditService.record(userId, "BOOKING", booking.getId(), "CREATE", null, "{\"status\":\"CONFIRMED\"}");
 
@@ -94,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
             paymentRepo.save(p);
         });
 
-        // 🔔 Notificación + Auditoría completa (6 parámetros)
+      
         notificationService.notifyBookingCancelled(booking.getUser().getId(), booking.getId());
         auditService.record(
                 booking.getUser().getId(),
@@ -106,7 +106,7 @@ public class BookingServiceImpl implements BookingService {
         );
     }
 
-    // 🔹 NUEVO método fusionado del segundo fragmento
+
     @Transactional(readOnly = true)
     public List<BookingEntity> listByUser(Long userId, int limit) {
         return bookingRepo.findByUser(userId).stream().limit(limit).toList();
