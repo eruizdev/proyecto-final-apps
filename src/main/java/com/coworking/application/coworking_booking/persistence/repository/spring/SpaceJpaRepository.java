@@ -11,7 +11,6 @@ public interface SpaceJpaRepository extends JpaRepository<SpaceEntity, Long> {
 
   List<SpaceEntity> findByActiveTrueAndSpaceStatus(SpaceEntity.SpaceStatus status);
 
-  // <-- requerido por WorkspaceController.list(...)
   @Query("""
     SELECT s FROM SpaceEntity s
     WHERE (:typeId IS NULL OR s.spaceType.id = :typeId)
