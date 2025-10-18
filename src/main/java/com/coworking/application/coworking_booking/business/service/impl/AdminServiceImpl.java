@@ -1,7 +1,7 @@
 package com.coworking.application.coworking_booking.business.service.impl;
 
 import com.coworking.application.coworking_booking.business.repository.AuditLogRepositoryPort;
-// usamos FQN para AdminService (evita el problema de import en el IDE)
+
 import com.coworking.application.coworking_booking.persistence.entity.AuditLogEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

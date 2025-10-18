@@ -22,7 +22,7 @@ public class WorkspaceController {
         this.spaceRepo = r;
     }
 
-    // 🔹 Fusionado: permite filtrar pero mantiene la versión admin original
+   
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping
     public List<WorkspaceResponseDTO> list(@RequestParam(required = false) Long typeId,
