@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -23,6 +24,7 @@ public class BookingServiceImpl implements BookingService {
     private final PaymentRepositoryPort paymentRepo;
     private final AuditService auditService;
     private final NotificationService notificationService;
+    private final SubscriptionService subscriptionService; // 🔹 NUEVO
 
     private final BookingPolicies policies = new BookingPolicies();
 
@@ -54,24 +56,27 @@ public class BookingServiceImpl implements BookingService {
 
         booking = bookingRepo.save(booking);
 
+       
+        boolean viaSub = subscriptionService != null && subscriptionService.hasActive(userId);
+
         paymentRepo.save(PaymentEntity.builder()
                 .booking(booking)
                 .amount(total)
                 .paymentStatus(PaymentEntity.PaymentStatus.PAID)
-                .paymentMethod("ONLINE")
+                .paymentMethod(viaSub ? "SUBSCRIPTION" : "ONLINE")
                 .paymentDate(now)
                 .createdAt(now)
                 .updatedAt(now)
                 .build());
 
-        // 🔔 Notificación + Auditoría completa (6 parámetros)
+    
         notificationService.notifyBookingCreated(userId, booking.getId());
         auditService.record(userId, "BOOKING", booking.getId(), "CREATE", null, "{\"status\":\"CONFIRMED\"}");
 
         return booking;
     }
 
-@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public BookingEntity get(Long id) {
         return bookingRepo.findById(id).orElseThrow(() -> new NotFoundException("Reserva"));
     }
@@ -88,9 +93,8 @@ public class BookingServiceImpl implements BookingService {
             p.setUpdatedAt(LocalDateTime.now());
             paymentRepo.save(p);
         });
-        
-        
-        // 🔔 Notificación + Auditoría completa (6 parámetros)
+
+      
         notificationService.notifyBookingCancelled(booking.getUser().getId(), booking.getId());
         auditService.record(
                 booking.getUser().getId(),
@@ -100,5 +104,11 @@ public class BookingServiceImpl implements BookingService {
                 "{\"status\":\"CONFIRMED\"}",
                 "{\"status\":\"CANCELLED\"}"
         );
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<BookingEntity> listByUser(Long userId, int limit) {
+        return bookingRepo.findByUser(userId).stream().limit(limit).toList();
     }
 }

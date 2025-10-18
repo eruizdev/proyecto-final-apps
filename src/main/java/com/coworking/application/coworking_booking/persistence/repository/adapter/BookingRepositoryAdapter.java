@@ -7,14 +7,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 public class BookingRepositoryAdapter implements BookingRepositoryPort {
-	
-	private final BookingJpaRepository jpa;
+
+    private final BookingJpaRepository jpa;
 
     @Override
     public BookingEntity save(BookingEntity b) {
@@ -35,8 +36,22 @@ public class BookingRepositoryAdapter implements BookingRepositoryPort {
     public int countFutureByUser(Long userId) {
         return jpa.countByUserIdAndStartTimeAfter(userId, LocalDateTime.now());
     }
-	
-	
+
+    
+    @Override
+    public List<BookingEntity> findStartingBetween(LocalDateTime start, LocalDateTime end) {
+        return jpa.findByStartTimeBetweenAndBookingStatusIn(
+                start,
+                end,
+                Set.of(
+                        BookingEntity.BookingStatus.CONFIRMED,
+                        BookingEntity.BookingStatus.PENDING
+                )
+        );
+    }
+
+    @Override
+    public List<BookingEntity> findByUser(Long userId) {
+        return jpa.findByUserIdOrderByStartTimeDesc(userId);
+    }
 }
-
-

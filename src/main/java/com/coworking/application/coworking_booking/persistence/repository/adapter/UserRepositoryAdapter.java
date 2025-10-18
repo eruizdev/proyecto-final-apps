@@ -11,21 +11,21 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class UserRepositoryAdapter implements UserRepositoryPort {
-	
-	private final UserJpaRepository jpa;
 
-    @Override
-    public Optional<UserEntity> findById(Long id) {
-        return jpa.findById(id);
-    }
+  private final UserJpaRepository jpa;
 
-    @Override
-    public UserEntity save(UserEntity u) {
-        return jpa.save(u);
-    }
+  @Override
+  public Optional<UserEntity> findById(Long id) {
+    return jpa.findById(id);
+  }
 
-    @Override
-    public List<UserEntity> findAll() {
-        return jpa.findAll(); // delega al repositorio JPA
-    }
+  @Override
+  public UserEntity save(UserEntity u) {
+    return jpa.save(u);
+  }
+
+  @Override
+  public List<UserEntity> findAll() {
+    return jpa.findAll();
+  }
 }
