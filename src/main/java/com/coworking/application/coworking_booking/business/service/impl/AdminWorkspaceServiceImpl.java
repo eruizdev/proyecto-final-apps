@@ -18,7 +18,6 @@ public class AdminWorkspaceServiceImpl implements AdminWorkspaceService {
   private final SpaceTypeJpaRepository types;
   private final SpaceJpaRepository spaces;
 
-  
   // TYPES
   @Override
   public SpaceTypeEntity createType(SpaceTypeEntity t) {
@@ -29,7 +28,6 @@ public class AdminWorkspaceServiceImpl implements AdminWorkspaceService {
     return types.save(t);
   }
 
-  
   @Override
   public SpaceTypeEntity updateType(Long id, SpaceTypeEntity t) {
     var cur = types.findById(id).orElseThrow(() -> new NotFoundException("SpaceType"));
@@ -48,23 +46,20 @@ public class AdminWorkspaceServiceImpl implements AdminWorkspaceService {
   @Override
   public List<SpaceTypeEntity> listTypes() { return types.findAll(); }
 
-
   // SPACES
-
-
-   @Override
+  @Override
   public SpaceEntity createSpace(SpaceEntity s, Long spaceTypeId) {
     var st = types.findById(spaceTypeId).orElseThrow(() -> new NotFoundException("SpaceType"));
     var now = LocalDateTime.now();
     s.setSpaceType(st);
     s.setSpaceStatus(s.getSpaceStatus() != null ? s.getSpaceStatus() : SpaceEntity.SpaceStatus.AVAILABLE);
-    s.setActive(s.getActive());
+    s.setActive(s.getActive()); // << tu lógica original
     s.setCreatedAt(now);
     s.setUpdatedAt(now);
     return spaces.save(s);
   }
 
-   @Override
+  @Override
   public SpaceEntity updateSpace(Long id, SpaceEntity s, Long spaceTypeId) {
     var cur = spaces.findById(id).orElseThrow(() -> new NotFoundException("Space"));
     if (spaceTypeId != null) {
@@ -79,11 +74,10 @@ public class AdminWorkspaceServiceImpl implements AdminWorkspaceService {
     cur.setLocation(s.getLocation());
     cur.setEquipment(s.getEquipment());
     cur.setImages(s.getImages());
-    cur.setActive(s.getActive());
+    cur.setActive(s.getActive()); // << tu lógica original
     cur.setUpdatedAt(LocalDateTime.now());
     return spaces.save(cur);
   }
-
 
   @Override
   public void deleteSpace(Long id) { spaces.deleteById(id); }
@@ -91,4 +85,3 @@ public class AdminWorkspaceServiceImpl implements AdminWorkspaceService {
   @Override
   public List<SpaceEntity> listSpaces() { return spaces.findAll(); }
 }
-

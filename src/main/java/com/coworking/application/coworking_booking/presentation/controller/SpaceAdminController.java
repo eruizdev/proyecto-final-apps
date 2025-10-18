@@ -8,16 +8,21 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@RestController @RequestMapping("/api/admin/spaces")
+@RestController
+@RequestMapping("/api/admin/spaces-basic") // ← cambiado para evitar conflicto
 @PreAuthorize("hasRole('ADMIN')")
 public class SpaceAdminController {
+
   private final SpaceJpaRepository spaces;
   private final SpaceTypeJpaRepository types;
 
-  public SpaceAdminController(SpaceJpaRepository s, SpaceTypeJpaRepository t){ this.spaces = s; this.types = t; }
+  public SpaceAdminController(SpaceJpaRepository s, SpaceTypeJpaRepository t) {
+    this.spaces = s;
+    this.types = t;
+  }
 
   @PostMapping
-  public Map<String,Object> create(@RequestBody Map<String,Object> body){
+  public Map<String, Object> create(@RequestBody Map<String, Object> body) {
     var now = LocalDateTime.now();
     var space = SpaceEntity.builder()
         .spaceType(types.findById(Long.valueOf(body.get("spaceTypeId").toString())).orElseThrow())
@@ -25,13 +30,16 @@ public class SpaceAdminController {
         .capacity(Integer.valueOf(body.get("capacity").toString()))
         .pricePerHour(new java.math.BigDecimal(body.get("pricePerHour").toString()))
         .spaceStatus(SpaceEntity.SpaceStatus.valueOf(body.get("status").toString()))
-        .active(true).createdAt(now).updatedAt(now).build();
+        .active(true)
+        .createdAt(now)
+        .updatedAt(now)
+        .build();
     space = spaces.save(space);
     return Map.of("id", space.getId(), "name", space.getName());
   }
 
   @PutMapping("/{id}")
-  public Map<String,Object> update(@PathVariable Long id, @RequestBody Map<String,Object> body){
+  public Map<String, Object> update(@PathVariable Long id, @RequestBody Map<String, Object> body) {
     var s = spaces.findById(id).orElseThrow();
     if (body.containsKey("name")) s.setName(body.get("name").toString());
     if (body.containsKey("capacity")) s.setCapacity(Integer.valueOf(body.get("capacity").toString()));
@@ -43,7 +51,7 @@ public class SpaceAdminController {
   }
 
   @DeleteMapping("/{id}")
-  public Map<String,Object> delete(@PathVariable Long id){
+  public Map<String, Object> delete(@PathVariable Long id) {
     spaces.deleteById(id);
     return Map.of("id", id, "deleted", true);
   }
