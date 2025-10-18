@@ -8,7 +8,9 @@ import java.time.LocalDateTime;
 @Table(name = "notifications",
        indexes = {
            @Index(name = "idx_user_id", columnList = "user_id"),
-           @Index(name = "idx_is_read", columnList = "is_read")
+           @Index(name = "idx_is_read", columnList = "is_read"),
+           @Index(name = "idx_user_is_read", columnList = "user_id,is_read"),
+           @Index(name = "idx_created_at", columnList = "created_at")
        })
 @Getter
 @Setter
@@ -25,18 +27,18 @@ public class NotificationEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @Column(nullable = false, length = 120)
+    @Column(nullable = false, length = 150)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String message;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "notification_type", length = 40)
+    @Column(name = "notification_type", nullable = false, length = 40)
     private NotificationType notificationType;
 
     @Column(name = "is_read", nullable = false)
-    private boolean isRead;
+    private boolean isRead = false;
 
     @Column(columnDefinition = "TEXT")
     private String metadata;
@@ -49,6 +51,8 @@ public class NotificationEntity {
 
     public enum NotificationType {
         BOOKING_CONFIRMATION,
-        BOOKING_CANCELLED
+        BOOKING_CANCELLED,
+        REMINDER_24H,
+        REMINDER_1H
     }
 }
