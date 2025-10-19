@@ -15,10 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Configuración de seguridad general para el backend.
- * Integra JWT, roles y filtros personalizados.
- */
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
@@ -32,16 +28,16 @@ public class SecurityConfig {
     http
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(reg -> reg
-            // Swagger y documentación
+            // Swagger / H2
             .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/h2/**").permitAll()
-            // Endpoints públicos
+            // Públicos
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/workspaces/**").permitAll()
-            // Roles protegidos
+            // Protegidos
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .requestMatchers("/api/afiliado/**").hasRole("AFILIADO")
             .requestMatchers("/api/visitante/**").hasRole("VISITANTE")
-            // El resto autenticado
+            // Resto
             .anyRequest().authenticated()
         )
         .headers(h -> h.frameOptions(f -> f.disable()))
@@ -50,15 +46,15 @@ public class SecurityConfig {
     return http.build();
   }
 
-  /** PasswordEncoder → BCrypt */
+  // PasswordEncoder con BCrypt
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 
-  /** AuthenticationManager usando el mismo PasswordEncoder */
+  // >>>>>>> AuthenticationManager usando BCrypt 
   @Bean
-  public AuthenticationManager authenticationManager(PasswordEncoder encoder) {
+  AuthenticationManager authenticationManager(PasswordEncoder encoder) {
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
     provider.setUserDetailsService(userDetailsService);
     provider.setPasswordEncoder(encoder);
