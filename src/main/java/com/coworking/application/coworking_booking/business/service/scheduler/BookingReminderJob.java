@@ -29,7 +29,7 @@ public class BookingReminderJob {
       String title = type==NotificationEntity.NotificationType.REMINDER_24H ? "Recordatorio 24h" : "Recordatorio 1h";
       String msg = "Tu reserva #" + b.getId() + " empieza a las " + b.getStartTime();
       // Creamos una notificación usando tu NotificationService (reutilizamos método existente simple)
-      // Si deseas, agrega métodos específicos para reminders en tu NotificationService.
+      
       notifications.notifyBookingCreated(b.getUser().getId(), b.getId()); // simple para MVP
     });
   }
