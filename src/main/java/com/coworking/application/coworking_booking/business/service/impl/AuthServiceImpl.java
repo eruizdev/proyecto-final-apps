@@ -5,6 +5,7 @@ import com.coworking.application.coworking_booking.business.service.AuthService;
 import com.coworking.application.coworking_booking.infraestructure.security.JwtProvider;
 import com.coworking.application.coworking_booking.persistence.entity.UserEntity;
 import com.coworking.application.coworking_booking.persistence.repository.spring.UserJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,8 @@ public class AuthServiceImpl implements AuthService {
   private final UserJpaRepository userJpa;
   private final PasswordEncoder passwordEncoder;
 
-  // Constructor principal (con PasswordEncoder inyectable)
+  // >>>>>>> Constructor PRINCIPAL para Spring (anotado)
+  @Autowired
   public AuthServiceImpl(UserRepositoryPort users,
                          JwtProvider jwt,
                          UserJpaRepository userJpa,
@@ -30,8 +32,7 @@ public class AuthServiceImpl implements AuthService {
     this.passwordEncoder = passwordEncoder;
   }
 
-  // Constructor de compatibilidad para tus tests existentes (3 args)
-  // Crea un BCryptPasswordEncoder por defecto.
+  // >>>>>>> Constructor de compatibilidad para tests (3 args)
   public AuthServiceImpl(UserRepositoryPort users,
                          JwtProvider jwt,
                          UserJpaRepository userJpa) {
@@ -43,8 +44,7 @@ public class AuthServiceImpl implements AuthService {
     var now = LocalDateTime.now();
     var u = UserEntity.builder()
         .email(email)
-        // Guardar con BCRYPT (reemplazo del {noop})
-        .passwordHash(passwordEncoder.encode(pass))
+        .passwordHash(passwordEncoder.encode(pass)) // BCRYPT
         .firstName(first)
         .lastName(last)
         .userRole(UserEntity.Role.USER)
@@ -73,18 +73,10 @@ public class AuthServiceImpl implements AuthService {
       throw new RuntimeException("Credenciales inválidas");
     }
 
-    return jwt.generateToken(
-        u.getId(),
-        u.getEmail(),
-        u.getUserRole().name()
-    );
+    return jwt.generateToken(u.getId(), u.getEmail(), u.getUserRole().name());
   }
 
-  /**
-   * Valida la contraseña soportando hashes antiguos con {noop} temporalmente.
-   * - Si el hash comienza con {noop}, compara en texto plano.
-   * - Si no, usa el PasswordEncoder (BCrypt).
-   */
+  /** Acepta temporalmente hashes {noop} antiguos ya que antes se usaba BCrypt */
   private boolean matchesLegacyAware(String rawPassword, String storedHash) {
     if (storedHash != null && storedHash.startsWith("{noop}")) {
       return ("{noop}" + rawPassword).equals(storedHash);
