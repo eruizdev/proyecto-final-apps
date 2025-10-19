@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 // Anotación para indicar que es una prueba de integración de Spring Boot
 @SpringBootTest @AutoConfigureMockMvc
-class SecurityBookingTest {
+class BookingPoliciesExtraTest {
 
 // Prueba para verificar la creación de una reserva
 // y anotaciones necesarias de JUnit
