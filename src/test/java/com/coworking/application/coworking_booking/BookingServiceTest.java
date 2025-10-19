@@ -15,14 +15,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-<<<<<<< HEAD
-import java.util.Set;
-=======
-<<<<<<< HEAD
-import java.util.Set;
-=======
->>>>>>> 08094f6 (TEST corregidos)
->>>>>>> 699c8e9 (commit)
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -67,14 +59,8 @@ class BookingServiceTest {
                 .id(2L)
                 .pricePerHour(BigDecimal.valueOf(10000))
                 .active(true)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
                 .capacity(10) // ✅ capacidad agregada
                 .spaceStatus(SpaceEntity.SpaceStatus.AVAILABLE) // ✅ estado agregado
->>>>>>> 08094f6 (TEST corregidos)
->>>>>>> 699c8e9 (commit)
                 .build();
 
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
@@ -85,17 +71,6 @@ class BookingServiceTest {
         when(paymentRepo.save(any())).thenAnswer(i -> i.getArgument(0));
         when(subscriptionService.hasActive(1L)).thenReturn(false);
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 699c8e9 (commit)
-        var now = LocalDateTime.now();
-        var booking = service.create(1L, 2L, now.plusHours(1), now.plusHours(2), 3);
-
-        assertEquals(BigDecimal.valueOf(10000), booking.getTotalAmount());
-<<<<<<< HEAD
-=======
-=======
         var now = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
 
         // ✅ Cumple política: mínimo 2 horas antes
@@ -105,8 +80,6 @@ class BookingServiceTest {
         var booking = service.create(1L, 2L, start, end, 3);
 
         assertEquals(BigDecimal.valueOf(10000 * 3), booking.getTotalAmount());
->>>>>>> 08094f6 (TEST corregidos)
->>>>>>> 699c8e9 (commit)
         verify(paymentRepo).save(any());
         verify(notificationService).notifyBookingCreated(eq(1L), any());
     }
