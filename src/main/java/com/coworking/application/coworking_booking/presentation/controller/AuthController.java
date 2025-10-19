@@ -2,6 +2,7 @@ package com.coworking.application.coworking_booking.presentation.controller;
 
 import com.coworking.application.coworking_booking.business.exception.BusinessException;
 import com.coworking.application.coworking_booking.business.exception.NotFoundException;
+import com.coworking.application.coworking_booking.business.exception.ValidationException;
 import com.coworking.application.coworking_booking.business.service.AuthService;
 import com.coworking.application.coworking_booking.persistence.repository.spring.UserJpaRepository;
 import com.coworking.application.coworking_booking.presentation.dto.auth.AuthRequestDTO;
@@ -30,16 +31,17 @@ public class AuthController {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Registrado"),
       @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
-      @ApiResponse(responseCode = "404", description = "No encontrado"),
+      @ApiResponse(responseCode = "409", description = "Email ya registrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
   public ResponseEntity<?> register(@RequestBody AuthRequestDTO req) {
     try {
       var u = authService.register(req.email(), req.password(), req.firstName(), req.lastName());
       return ResponseEntity.ok(new AuthResponseDTO(u.getId(), u.getEmail(), u.getUserRole().name()));
-    } catch (NotFoundException e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-    } catch (BusinessException | IllegalArgumentException e) {
+    } catch (ValidationException e) {
+     
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    } catch (BusinessException e) {
       return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");

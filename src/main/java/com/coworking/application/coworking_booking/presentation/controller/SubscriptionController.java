@@ -25,10 +25,16 @@ public class SubscriptionController {
       @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
-  public ResponseEntity<?> activate(@RequestParam Long userId, @RequestParam Long planId){
+  public ResponseEntity<?> activate(@RequestParam("userId") Long userId,
+                                    @RequestParam("planId") Long planId){
     try {
       var sub = service.activate(userId, planId);
-      return ResponseEntity.ok(java.util.Map.of("id", sub.getId(), "userId", userId, "plan", sub.getPlan().getName(), "active", sub.isActive()));
+      return ResponseEntity.ok(java.util.Map.of(
+          "id", sub.getId(),
+          "userId", userId,
+          "plan", sub.getPlan().getName(),
+          "active", sub.isActive()
+      ));
     } catch (NotFoundException e){
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     } catch (BusinessException | IllegalArgumentException e){
@@ -45,11 +51,15 @@ public class SubscriptionController {
       @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
-  public ResponseEntity<?> me(@RequestParam Long userId){
+  public ResponseEntity<?> me(@RequestParam("userId") Long userId){
     try {
       var s = service.me(userId);
-      return ResponseEntity.ok( s==null ? java.util.Map.of("active", false) :
-          java.util.Map.of("active", true, "plan", s.getPlan().getName(), "startAt", s.getStartAt()) );
+      return ResponseEntity.ok(
+          s == null ? java.util.Map.of("active", false)
+                    : java.util.Map.of("active", true,
+                                       "plan", s.getPlan().getName(),
+                                       "startAt", s.getStartAt())
+      );
     } catch (BusinessException | IllegalArgumentException e){
       return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e){
