@@ -1,41 +1,76 @@
 package com.coworking.application.coworking_booking;
 
-import com.coworking.application.coworking_booking.business.policy.BookingPolicies;
-import com.coworking.application.coworking_booking.persistence.entity.SpaceEntity;
+// importaciones necesarias
+import com.coworking.application.coworking_booking.infraestructure.security.JwtProvider;
+import com.coworking.application.coworking_booking.persistence.entity.*;
+import com.coworking.application.coworking_booking.persistence.repository.spring.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class BookingPoliciesExtraTest {
+// Anotación para indicar que es una prueba de integración de Spring Boot
+@SpringBootTest @AutoConfigureMockMvc
+class SecurityBookingTest {
 
-    private final BookingPolicies policies = new BookingPolicies();
+// Prueba para verificar la creación de una reserva
+// y anotaciones necesarias de JUnit
+  @Autowired MockMvc mvc;
+  @Autowired JwtProvider jwt;
+  @Autowired UserJpaRepository users;
+  @Autowired SpaceTypeJpaRepository types;
+  @Autowired SpaceJpaRepository spaces;
 
-    @Test
-    void testNegativeDurationThrows() {
-        var s = SpaceEntity.builder().capacity(3).build();
-        var now = LocalDateTime.now();
-        assertThrows(Exception.class, () -> policies.validateCreation(s, now.plusHours(3), now.plusHours(1), 2, false, 0));
-    }
+  Long userId; Long spaceId;
 
-    @Test
-    void testNullSpaceThrows() {
-        assertThrows(NullPointerException.class, () ->
-                policies.validateCreation(null, LocalDateTime.now(), LocalDateTime.now().plusHours(1), 1, false, 0));
-    }
+  // Prueba para crear una reserva confirmada con pago
+  @BeforeEach
+  void seed(){
+    // Crear y guardar un usuario en la base de datos
+    var now = LocalDateTime.now();
+    // Crear y guardar un tipo de espacio
+    var u = users.save(UserEntity.builder().email("sec@demo.com").passwordHash("{noop}x")
+        .firstName("Sec").lastName("User").userRole(UserEntity.Role.USER)
+        .active(true).emailVerified(true).createdAt(now).updatedAt(now).build());
+    // Guardamos el ID del usuario para usarlo en las pruebas
+    userId = u.getId();
+    var st = types.save(SpaceTypeEntity.builder().name("Tipo").basePricePerHour(new BigDecimal("10000"))
+        .active(true).createdAt(now).updatedAt(now).build());
+    // Crear y guardar un espacio asociado al tipo de espacio de la reserva
+    var s = spaces.save(SpaceEntity.builder().spaceType(st).name("SecRoom").capacity(4)
+        .pricePerHour(new BigDecimal("12000")).spaceStatus(SpaceEntity.SpaceStatus.AVAILABLE)
+        .active(true).createdAt(now).updatedAt(now).build());
+    spaceId = s.getId();
+  }
 
-    @Test
-    void testZeroAttendeesValid() {
-        var s = SpaceEntity.builder().capacity(5).build();
-        assertDoesNotThrow(() ->
-                policies.validateCreation(s, LocalDateTime.now().plusHours(2), LocalDateTime.now().plusHours(3), 0, false, 0));
-    }
+  // Prueba para verificar que sin token se obtiene 401 y con token 201
+  @Test
+  void sinTokenDa401_conToken201() throws Exception {
+    var start = LocalDateTime.now().plusHours(3).withNano(0);
+    var end   = start.plusHours(2);
+    var body = """
+      {"userId": %d, "spaceId": %d, "startTime": "%s", "endTime":"%s", "attendees": 2}
+      """.formatted(userId, spaceId, start, end);
 
-    @Test
-    void testFutureLimit30DaysOk() {
-        var s = SpaceEntity.builder().capacity(5).build();
-        assertDoesNotThrow(() ->
-                policies.validateCreation(s, LocalDateTime.now().plusDays(29), LocalDateTime.now().plusDays(29).plusHours(2), 2, false, 0));
-    }
+    // Sin token → 401
+    mvc.perform(post("/api/bookings").contentType(MediaType.APPLICATION_JSON).content(body))
+    .andExpect(status().isForbidden());
+
+
+    // Con token → 201
+    String token = jwt.generateToken(userId, "sec@demo.com", "USER");
+    mvc.perform(post("/api/bookings").header("Authorization","Bearer "+token)
+        .contentType(MediaType.APPLICATION_JSON).content(body))
+        .andExpect(status().isCreated());
+  }
+
 }

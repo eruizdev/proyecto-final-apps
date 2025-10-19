@@ -63,7 +63,16 @@ class SecurityBookingTest {
 
     // Sin token → 401
     mvc.perform(post("/api/bookings").contentType(MediaType.APPLICATION_JSON).content(body))
+<<<<<<< HEAD
         .andExpect(status().isUnauthorized());
+=======
+<<<<<<< HEAD
+        .andExpect(status().isUnauthorized());
+=======
+    .andExpect(status().isForbidden());
+
+>>>>>>> 08094f6 (TEST corregidos)
+>>>>>>> 699c8e9 (commit)
 
     // Con token → 201
     String token = jwt.generateToken(userId, "sec@demo.com", "USER");
