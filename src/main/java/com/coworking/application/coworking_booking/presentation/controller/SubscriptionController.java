@@ -49,6 +49,7 @@ public class SubscriptionController {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+      @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
   public ResponseEntity<?> me(@RequestParam("userId") Long userId){

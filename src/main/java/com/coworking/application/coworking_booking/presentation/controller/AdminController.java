@@ -35,8 +35,6 @@ public class AdminController {
     this.paymentRepo = p;
   }
 
-  //  AUDITS 
-
   @GetMapping("/audits")
   @Operation(summary = "Listar auditorías", description = "Devuelve todas las auditorías")
   @ApiResponses({
@@ -57,13 +55,13 @@ public class AdminController {
         m.put("createdAt", a.getCreatedAt());
         return m;
       }).toList();
-      return ResponseEntity.ok(body); // 200
+      return ResponseEntity.ok(body);
     } catch (NotFoundException e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     } catch (BusinessException | IllegalArgumentException e) {
-      return ResponseEntity.badRequest().body(e.getMessage()); // 400
+      return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor"); // 500
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");
     }
   }
 
@@ -97,14 +95,12 @@ public class AdminController {
     }
   }
 
- 
-
-  //  REPORTS
-
   @GetMapping("/reports/bookings")
   @Operation(summary = "Reporte de reservas", description = "Devuelve todas las reservas con detalles")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+      @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
   public ResponseEntity<?> bookings() {
@@ -141,13 +137,13 @@ public class AdminController {
   )
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+      @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
   public ResponseEntity<?> revenue() {
     try {
       List<PaymentEntity> payments = paymentRepo.findAll();
-
-      // Agrupar por (userId, userEmail, spaceId, spaceName)
       Map<RevenueKey, java.math.BigDecimal> totals = payments.stream()
           .collect(Collectors.groupingBy(
               p -> {
@@ -160,7 +156,6 @@ public class AdminController {
               },
               Collectors.reducing(java.math.BigDecimal.ZERO, PaymentEntity::getAmount, java.math.BigDecimal::add)
           ));
-
       List<Map<String, Object>> out = totals.entrySet().stream().map(e -> {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("userId", e.getKey().userId());
@@ -173,13 +168,11 @@ public class AdminController {
           .comparing((Map<String, Object> m) -> (Long) m.get("userId"), Comparator.nullsLast(Long::compareTo))
           .thenComparing(m -> (Long) m.get("spaceId"), Comparator.nullsLast(Long::compareTo))
       ).toList();
-
       return ResponseEntity.ok(out);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");
     }
   }
 
-  // Helper record para la clave del agregado de revenue
   private record RevenueKey(Long userId, String userEmail, Long spaceId, String spaceName) {}
 }

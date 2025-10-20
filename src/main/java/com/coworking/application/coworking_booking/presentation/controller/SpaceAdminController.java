@@ -119,6 +119,7 @@ public class SpaceAdminController {
   @Operation(summary = "Eliminar espacio (básico)", description = "Elimina un espacio por ID")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "Eliminado"),
+      @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "404", description = "Espacio no encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
@@ -138,6 +139,7 @@ public class SpaceAdminController {
              description = "Crea una deuda/multa indicando id de usuario, motivo y precio. Solo ADMIN.")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "Creado"),
+      @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
       @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
@@ -180,6 +182,8 @@ public class SpaceAdminController {
              description = "Devuelve todas las multas/deudas con todos sus detalles. Solo ADMIN.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+      @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
   public ResponseEntity<?> listFines() {

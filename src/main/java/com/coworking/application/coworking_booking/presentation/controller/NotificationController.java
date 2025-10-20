@@ -28,6 +28,8 @@ public class NotificationController {
   )
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+      @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "401", description = "No autenticado"),
       @ApiResponse(responseCode = "403", description = "Prohibido"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")

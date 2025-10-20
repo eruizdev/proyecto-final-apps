@@ -31,6 +31,7 @@ public class AuthController {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Registrado"),
       @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+      @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "409", description = "Email ya registrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
@@ -39,7 +40,6 @@ public class AuthController {
       var u = authService.register(req.email(), req.password(), req.firstName(), req.lastName());
       return ResponseEntity.ok(new AuthResponseDTO(u.getId(), u.getEmail(), u.getUserRole().name()));
     } catch (ValidationException e) {
-     
       return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     } catch (BusinessException e) {
       return ResponseEntity.badRequest().body(e.getMessage());

@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-/**
- * Muestra las MULTAS (fines) del usuario.
- */
 @RestController
 @RequestMapping("/api/payments")
 @PreAuthorize("hasAnyRole('ADMIN','USER')")
@@ -40,10 +37,7 @@ public class PaymentController {
   })
   public ResponseEntity<?> finesByUser(@PathVariable Long userId) {
     try {
-      // Traemos todos los pagos del usuario, luego filtramos SOLO multas.
       var all = repo.findByBooking_User_IdOrderByPaymentDateDesc(userId);
-
-     
       var fines = all.stream()
           .filter(p ->
               (p.getPaymentStatus() != null && "FINE".equalsIgnoreCase(p.getPaymentStatus().name())) ||
@@ -54,8 +48,6 @@ public class PaymentController {
             m.put("id", p.getId());
             m.put("userId", p.getBooking().getUser().getId());
             m.put("bookingId", p.getBooking().getId());
-            // Concepto/razón de la multa: si no tienes un campo específico,
-            // usamos paymentMethod como concepto, puedes renombrar si corresponde.
             m.put("concept", p.getPaymentMethod());
             m.put("amount", p.getAmount());
             m.put("status", p.getPaymentStatus() != null ? p.getPaymentStatus().name() : null);
@@ -63,11 +55,7 @@ public class PaymentController {
             return m;
           })
           .toList();
-
-     
-      // if (fines.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hay multas para el usuario.");
       return ResponseEntity.ok(fines);
-
     } catch (NotFoundException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     } catch (BusinessException | IllegalArgumentException e) {
