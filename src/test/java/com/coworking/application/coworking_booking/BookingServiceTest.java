@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -60,6 +59,8 @@ class BookingServiceTest {
                 .id(2L)
                 .pricePerHour(BigDecimal.valueOf(10000))
                 .active(true)
+                .capacity(10) // ✅ capacidad agregada
+                .spaceStatus(SpaceEntity.SpaceStatus.AVAILABLE) // ✅ estado agregado
                 .build();
 
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
@@ -70,10 +71,15 @@ class BookingServiceTest {
         when(paymentRepo.save(any())).thenAnswer(i -> i.getArgument(0));
         when(subscriptionService.hasActive(1L)).thenReturn(false);
 
-        var now = LocalDateTime.now();
-        var booking = service.create(1L, 2L, now.plusHours(1), now.plusHours(2), 3);
+        var now = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
 
-        assertEquals(BigDecimal.valueOf(10000), booking.getTotalAmount());
+        // ✅ Cumple política: mínimo 2 horas antes
+        var start = now.plusHours(3);
+        var end = now.plusHours(6);
+
+        var booking = service.create(1L, 2L, start, end, 3);
+
+        assertEquals(BigDecimal.valueOf(10000 * 3), booking.getTotalAmount());
         verify(paymentRepo).save(any());
         verify(notificationService).notifyBookingCreated(eq(1L), any());
     }

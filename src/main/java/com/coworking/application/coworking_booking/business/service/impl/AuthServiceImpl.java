@@ -1,5 +1,6 @@
 package com.coworking.application.coworking_booking.business.service.impl;
 
+import com.coworking.application.coworking_booking.business.exception.ValidationException;
 import com.coworking.application.coworking_booking.business.repository.UserRepositoryPort;
 import com.coworking.application.coworking_booking.business.service.AuthService;
 import com.coworking.application.coworking_booking.infraestructure.security.JwtProvider;
@@ -20,7 +21,6 @@ public class AuthServiceImpl implements AuthService {
   private final UserJpaRepository userJpa;
   private final PasswordEncoder passwordEncoder;
 
-  // >>>>>>> Constructor PRINCIPAL para Spring (anotado)
   @Autowired
   public AuthServiceImpl(UserRepositoryPort users,
                          JwtProvider jwt,
@@ -32,7 +32,6 @@ public class AuthServiceImpl implements AuthService {
     this.passwordEncoder = passwordEncoder;
   }
 
-  // >>>>>>> Constructor de compatibilidad para tests (3 args)
   public AuthServiceImpl(UserRepositoryPort users,
                          JwtProvider jwt,
                          UserJpaRepository userJpa) {
@@ -41,10 +40,21 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public UserEntity register(String email, String pass, String first, String last) {
+    // Normaliza y valida email
+    if (email == null || email.isBlank()) {
+      throw new ValidationException("El email es obligatorio.");
+    }
+    String normalizedEmail = email.trim().toLowerCase();
+
+    // Verifica duplicado 
+    if (userJpa.existsByEmail(normalizedEmail)) {
+      throw new ValidationException("El email ya está registrado.");
+    }
+
     var now = LocalDateTime.now();
     var u = UserEntity.builder()
-        .email(email)
-        .passwordHash(passwordEncoder.encode(pass)) // BCRYPT
+        .email(normalizedEmail)
+        .passwordHash(passwordEncoder.encode(pass))
         .firstName(first)
         .lastName(last)
         .userRole(UserEntity.Role.USER)
@@ -53,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
         .createdAt(now)
         .updatedAt(now)
         .build();
+
     return users.save(u);
   }
 
@@ -76,7 +87,6 @@ public class AuthServiceImpl implements AuthService {
     return jwt.generateToken(u.getId(), u.getEmail(), u.getUserRole().name());
   }
 
-  /** Acepta temporalmente hashes {noop} antiguos ya que antes se usaba BCrypt */
   private boolean matchesLegacyAware(String rawPassword, String storedHash) {
     if (storedHash != null && storedHash.startsWith("{noop}")) {
       return ("{noop}" + rawPassword).equals(storedHash);
