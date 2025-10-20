@@ -53,7 +53,6 @@ public class WorkspaceController {
         ).toList();
         return ResponseEntity.ok(body);
       }
-
       SpaceEntity.SpaceStatus st = status == null ? null : SpaceEntity.SpaceStatus.valueOf(status);
       var list = spaceRepo.search(typeId, capacityMin, st);
       var body = list.stream().map(s ->

@@ -26,6 +26,7 @@ public class AdminSubscriptionPlanController {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Creado"),
       @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+      @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
   public ResponseEntity<?> create(@RequestBody SubscriptionPlanCreateDTO dto) {
@@ -36,17 +37,14 @@ public class AdminSubscriptionPlanController {
       if (dto.price() == null || dto.price().signum() < 0) {
         return ResponseEntity.badRequest().body("price inválido");
       }
-      // evitar duplicados por nombre
       if (plans.findByTypeIgnoreCase(dto.type()).isPresent()) {
         return ResponseEntity.badRequest().body("Ya existe un plan con ese tipo");
       }
-
       var saved = plans.save(SubscriptionPlanEntity.builder()
           .type(dto.type().trim())
           .price(dto.price())
           .active(true)
           .build());
-
       return ResponseEntity.ok(new SubscriptionPlanResponseDTO(
           saved.getId(), saved.getType(), saved.getPrice(), saved.isActive()
       ));

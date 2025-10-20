@@ -2,15 +2,20 @@ package com.coworking.application.coworking_booking.presentation.controller;
 
 import com.coworking.application.coworking_booking.persistence.entity.SpaceEntity;
 import com.coworking.application.coworking_booking.persistence.entity.UserFineEntity;
-import com.coworking.application.coworking_booking.persistence.repository.spring.*;
+import com.coworking.application.coworking_booking.persistence.repository.spring.SpaceJpaRepository;
+import com.coworking.application.coworking_booking.persistence.repository.spring.SpaceTypeJpaRepository;
+import com.coworking.application.coworking_booking.persistence.repository.spring.UserFineJpaRepository;
+import com.coworking.application.coworking_booking.persistence.repository.spring.UserJpaRepository;
 import com.coworking.application.coworking_booking.presentation.dto.workspace.SpaceBasicUpsertDTO;
 import com.coworking.application.coworking_booking.presentation.dto.workspace.FineCreateDTO;
 import com.coworking.application.coworking_booking.presentation.dto.workspace.FineResponseDTO;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -25,8 +30,6 @@ public class SpaceAdminController {
 
   private final SpaceJpaRepository spaces;
   private final SpaceTypeJpaRepository types;
-
-  // NUEVO: repos de usuarios y multas
   private final UserJpaRepository users;
   private final UserFineJpaRepository fines;
 
@@ -41,8 +44,6 @@ public class SpaceAdminController {
     this.fines = fines;
   }
 
- 
-
   @PostMapping
   @Operation(summary = "Crear espacio (básico)", description = "Crea un espacio con mapa simple")
   @ApiResponses({
@@ -53,13 +54,23 @@ public class SpaceAdminController {
   })
   public ResponseEntity<?> create(@RequestBody SpaceBasicUpsertDTO body) {
     try {
+      if (body.getName() == null || body.getName().isBlank())
+        return ResponseEntity.badRequest().body("El nombre es obligatorio");
+      if (body.getCapacity() == null || body.getCapacity() < 1)
+        return ResponseEntity.badRequest().body("La capacidad debe ser >= 1");
+      if (body.getPricePerHour() == null || body.getPricePerHour().compareTo(BigDecimal.ZERO) <= 0)
+        return ResponseEntity.badRequest().body("El precio por hora debe ser > 0");
+      if (body.getStatus() == null || body.getStatus().isBlank())
+        return ResponseEntity.badRequest().body("El status es obligatorio");
+
       var now = LocalDateTime.now();
+      var status = SpaceEntity.SpaceStatus.valueOf(body.getStatus());
       var space = SpaceEntity.builder()
           .spaceType(types.findById(body.getSpaceTypeId()).orElseThrow())
-          .name(body.getName())
+          .name(body.getName().trim())
           .capacity(body.getCapacity())
           .pricePerHour(body.getPricePerHour())
-          .spaceStatus(SpaceEntity.SpaceStatus.valueOf(body.getStatus()))
+          .spaceStatus(status)
           .active(true)
           .createdAt(now)
           .updatedAt(now)
@@ -69,7 +80,9 @@ public class SpaceAdminController {
     } catch (NoSuchElementException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("SpaceType no encontrado");
     } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
+      return ResponseEntity.badRequest().body("Status inválido");
+    } catch (DataIntegrityViolationException e) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflicto de datos");
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");
     }
@@ -106,27 +119,27 @@ public class SpaceAdminController {
   @Operation(summary = "Eliminar espacio (básico)", description = "Elimina un espacio por ID")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "Eliminado"),
+      @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "404", description = "Espacio no encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
   public ResponseEntity<?> delete(@PathVariable("id") Long id) {
     try {
-      spaces.deleteById(id); // elimina solo por ID
-      return ResponseEntity.noContent().build(); // 204
+      spaces.deleteById(id);
+      return ResponseEntity.noContent().build();
     } catch (EmptyResultDataAccessException e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Espacio no encontrado"); // 404 si no existe
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Espacio no encontrado");
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");
     }
   }
-
-  // ------------------ ENDPOINTS: MULTAS ------------------
 
   @PostMapping("/fines")
   @Operation(summary = "Crear multa para un usuario",
              description = "Crea una deuda/multa indicando id de usuario, motivo y precio. Solo ADMIN.")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "Creado"),
+      @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
       @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
@@ -137,19 +150,15 @@ public class SpaceAdminController {
           || req.getReason() == null || req.getReason().isBlank()) {
         return ResponseEntity.badRequest().body("userId, reason y amount (>0) son obligatorios");
       }
-
       var user = users.findById(req.getUserId())
           .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado"));
-
       var fine = UserFineEntity.builder()
           .user(user)
           .reason(req.getReason())
           .amount(req.getAmount())
           .createdAt(LocalDateTime.now())
           .build();
-
       fine = fines.save(fine);
-
       var out = FineResponseDTO.builder()
           .id(fine.getId())
           .userId(user.getId())
@@ -158,7 +167,6 @@ public class SpaceAdminController {
           .amount(fine.getAmount())
           .createdAt(fine.getCreatedAt())
           .build();
-
       return ResponseEntity.status(HttpStatus.CREATED).body(out);
     } catch (NoSuchElementException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -174,6 +182,8 @@ public class SpaceAdminController {
              description = "Devuelve todas las multas/deudas con todos sus detalles. Solo ADMIN.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+      @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
   public ResponseEntity<?> listFines() {
@@ -188,7 +198,6 @@ public class SpaceAdminController {
               .createdAt(f.getCreatedAt())
               .build()
       ).toList();
-
       return ResponseEntity.ok(out);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");

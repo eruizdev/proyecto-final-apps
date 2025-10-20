@@ -30,6 +30,7 @@ public class BookingController {
   @Operation(summary = "Crear reserva", description = "Crea una nueva reserva")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "Creado"),
+      @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
       @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
@@ -85,6 +86,7 @@ public class BookingController {
   @Operation(summary = "Cancelar reserva", description = "Cancela una reserva por ID")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "Eliminado"),
+      @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
       @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
@@ -113,7 +115,6 @@ public class BookingController {
   })
   public ResponseEntity<?> byUser(@PathVariable Long userId) {
     try {
-      // Valor interno, no aparece en Swagger
       final int INTERNAL_LIMIT = 50;
       List<BookingResponseDTO> list = service.listByUser(userId, INTERNAL_LIMIT).stream()
           .map(b -> new BookingResponseDTO(

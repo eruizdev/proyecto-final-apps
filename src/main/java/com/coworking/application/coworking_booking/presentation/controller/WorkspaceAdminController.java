@@ -27,13 +27,12 @@ public class WorkspaceAdminController {
     this.service = s;
   }
 
-  // ---------------------- SPACE TYPES ----------------------
-
   @PostMapping("/space-types")
   @Operation(summary = "Crear tipo de espacio", description = "Crea un SpaceType")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+      @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
   public ResponseEntity<?> createType(@RequestBody SpaceTypeUpsertDTO dto) {
@@ -86,6 +85,7 @@ public class WorkspaceAdminController {
   @Operation(summary = "Eliminar tipo de espacio", description = "Borra un SpaceType por ID")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "Eliminado"),
+      @ApiResponse(responseCode = "200", description = "OK"),
       @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
@@ -103,6 +103,8 @@ public class WorkspaceAdminController {
   @Operation(summary = "Listar tipos de espacio", description = "Devuelve SpaceTypes")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "OK"),
+      @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+      @ApiResponse(responseCode = "404", description = "No encontrado"),
       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
   })
   public ResponseEntity<?> listTypes() {
